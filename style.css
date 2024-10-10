@@ -54,6 +54,20 @@ li {
     color: var(--color-directory) !important;
 }
 
+@media only screen and (max-width: 1000px) {
+    body {
+        font-size: 1em !important;
+    }
+
+    #header, main {
+        max-width: 100% !important;
+    }
+
+    #left-container, #right-container {
+        display: none;
+    }
+}
+
 
 /*
  *      Header
