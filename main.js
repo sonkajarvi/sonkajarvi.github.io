@@ -2,7 +2,7 @@ const QUERY_PARAM = "q";
 
 let repository = new Repository();
 
-function onLoad() {
+window.addEventListener("load", () => {
     const urlParams = new URLSearchParams(window.location.search);
 
     if (!urlParams.has(QUERY_PARAM)) {
@@ -20,4 +20,4 @@ function onLoad() {
     title.innerHTML = `Fetching ${owner} / ${repo}...`;
 
     repository.init(owner, repo);
-}
+});
