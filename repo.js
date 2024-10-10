@@ -1,35 +1,26 @@
 class Repository {
-    // VARIABLE                             SET BY
-    // owner                                init
-    // repo                                 init
-    // avatar                               queryRepo
+    #owner = "";
+    #repo = "";
+    #avatar = "";
 
-    // commits[{message, url}]              queryCommit
-    // commitsTotal                         queryCommit
-    // branches[name]                       queryBranch
-    // branchesTotal                        queryBranch
-    // tags[name]                           queryTags
-    // tagsTotal                            queryTags
+    #description = "";
+    #stars = 0;
+    #watching = 0;
+    #forks = 0;
 
-    // files[{name, isDir}]
+    #commits = [];
+    #commitsTotal = 0;
+    #branches = [];
+    #branchesTotal = 0;
+    #tags = [];
+    #tagsTotal = 0;
 
-    // description                          queryRepo
-    // stars                                queryRepo
-    // watching                             queryRepo
-    // forks                                queryRepo
+    #files = [];
+    #currentDirectory = "/";
+    #fileName = "";
+    #fileContents = "";
 
-    // currentDirectory
-    // fileName                             queryFile
-    // fileContents                         queryFile
-
-    constructor() {
-        this.commits = new Array();
-        this.branches = new Array();
-        this.tags = new Array();
-        this.files = new Array();
-    }
-
-    async fetchHelper(url) {
+    async #fetchHelper(url) {
         return await fetch(url, {
             headers: {
                 "X-GitHub-Api-Version": "2022-11-28"
@@ -43,18 +34,18 @@ class Repository {
     // Otherwise, show alert
     //
     // NOTE: Makes 1 request
-    async queryRepo(owner, repo) {
-        const res = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}`);
+    async #queryRepo(owner, repo) {
+        const res = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}`);
         if (!res.ok)
             throw new Error(res.status);
 
         const json = await res.json();
-        this.avatar = json.owner.avatar_url;
-        this.description = json.description || "No description provided.";
-        this.stars = json.stargazers_count;
-        this.watching = json.subscribers_count;
-        this.forks = json.forks;
-        this.branches.push(json.default_branch);
+        this.#avatar = json.owner.avatar_url;
+        this.#description = json.description || "No description provided.";
+        this.#stars = json.stargazers_count;
+        this.#watching = json.subscribers_count;
+        this.#forks = json.forks;
+        this.#branches.push(json.default_branch);
 
         console.log("Query repository:", owner, "/", repo);
     }
@@ -63,34 +54,34 @@ class Repository {
     // and the total amount
     //
     // NOTE: Makes 2 requests
-    async queryCommits(owner, repo) {
-        const fivePerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=5`);
+    async #queryCommits(owner, repo) {
+        const fivePerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=5`);
         if (!fivePerPage.ok)
             throw new Error(fivePerPage.status);
 
         // Get the 5 most recent commits
         const commits = await fivePerPage.json();
         if (commits.length === 0) {
-            this.commitsTotal = 0;
+            this.#commitsTotal = 0;
             return;
         }
 
         commits.map((e) => {
-            this.commits.push({
+            this.#commits.push({
                 message: e.commit.message.substring(0, 100),
                 url: e.html_url
             });
         })
 
         // Get total commits
-        const onePerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`);
+        const onePerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=1`);
         if (!onePerPage.ok)
             throw new Error(onePerPage.status);
 
         const link = await onePerPage.headers.get("link");
         const lastUrl = link.split(",")[1].split(";")[0].slice(2, -1);
         const lastPage = Number(lastUrl.split("=")[2]);
-        this.commitsTotal = lastPage;
+        this.#commitsTotal = lastPage;
 
         console.log("Query commits");
     }
@@ -99,31 +90,31 @@ class Repository {
     // and the total amount
     //
     // NOTE: Makes 2 requests
-    async queryBranches(owner, repo) {
-        const fourPerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/branches?per_page=4`);
+    async #queryBranches(owner, repo) {
+        const fourPerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/branches?per_page=4`);
         if (!fourPerPage.ok)
             throw new Error(fourPerPage.status);
 
         // Get the top 4 branches
         const branches = await fourPerPage.json();
         if (branches.length <= 1) {
-            this.branchesTotal = branches.length;
+            this.#branchesTotal = branches.length;
             return;
         }
 
         branches.map((e) => {
-            this.branches.push(e.name);
+            this.#branches.push(e.name);
         });
 
         // Get total branches
-        const onePerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/branches?per_page=1`);
+        const onePerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/branches?per_page=1`);
         if (!onePerPage.ok)
             throw new Error(fourPerPage.status);
 
         const link = await onePerPage.headers.get("link");
         const lastUrl = link.split(",")[1].split(";")[0].slice(2, -1);
         const lastPage = Number(lastUrl.split("=")[2]);
-        this.branchesTotal = lastPage;
+        this.#branchesTotal = lastPage;
 
         console.log("Query branches")
     }
@@ -132,31 +123,31 @@ class Repository {
     // and the total amount
     //
     // NOTE: Makes 2 requests
-    async queryTags(owner, repo) {
-        const fivePerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=5`);
+    async #queryTags(owner, repo) {
+        const fivePerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=5`);
         if (!fivePerPage.ok)
             throw new Error(fivePerPage.status);
         
         // Get the top 5 tags
         const tags = await fivePerPage.json();
         if (tags.length === 0) {
-            this.tagsTotal = 0;
+            this.#tagsTotal = 0;
             return;
         }
 
         tags.map((e) => {
-            this.tags.push(e.name);
+            this.#tags.push(e.name);
         });
 
         // Get total tags
-        const onePerPage = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`);
+        const onePerPage = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/tags?per_page=1`);
         if (!onePerPage.ok)
             throw new Error(fourPerPage.status);
 
         const link = await onePerPage.headers.get("link");
         const lastUrl = link.split(",")[1].split(";")[0].slice(2, -1);
         const lastPage = Number(lastUrl.split("=")[2]);
-        this.tagsTotal = lastPage;
+        this.#tagsTotal = lastPage;
 
         console.log("Query tags");
     }
@@ -164,8 +155,8 @@ class Repository {
     // Query root files and directories
     // 
     // NOTE: Makes 1 request
-    async queryFiles(owner, repo, path) {
-        const res = await this.fetchHelper(`https://api.github.com/repos/${owner}/${repo}/contents${path}`);
+    async #queryFiles(owner, repo, path) {
+        const res = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/contents${path}`);
         if (!res)
             throw new Error(res.status);
 
@@ -173,8 +164,8 @@ class Repository {
         if (files.length === 0)
             return;
 
-        let tmp_dirs = new Array();
-        let tmp_files = new Array();
+        let tmp_dirs = [];
+        let tmp_files = [];
         
         files.map((e) => {
             const isDir = e.type === "dir";
@@ -184,13 +175,13 @@ class Repository {
                 tmp_files.push({ name: e.name, "isDir": isDir});
         });
 
-        this.files.length = 0;
+        this.#files.length = 0;
 
         if (path !== "/")
-            this.files.push({ name: "..", "isDir": true });
+            this.#files.push({ name: "..", "isDir": true });
 
-        this.files.push(...tmp_dirs);
-        this.files.push(...tmp_files);
+        this.#files.push(...tmp_dirs);
+        this.#files.push(...tmp_files);
         this.currentDirectory = path;
 
         console.log("Query files:", path);
@@ -198,69 +189,69 @@ class Repository {
 
     // NOTE: Makes 9 requests; 1 + 2 + 2 + 2 + 2
     async init(owner, repo) {
-        this.owner = owner;
-        this.repo = repo;
-        this.currentDirectory = "/";
+        this.#owner = owner;
+        this.#repo = repo;
+        this.#currentDirectory = "/";
 
         const title = document.querySelector("#input-title");
 
         // Get commit data
         try {
-            this.setFetching();
+            this.#setFetching();
 
-            await this.queryRepo(owner, repo);
-            await this.queryCommits(owner, repo);
-            await this.queryBranches(owner, repo);
-            await this.queryTags(owner, repo);
-            await this.queryFiles(owner, repo, this.currentDirectory);
+            await this.#queryRepo(owner, repo);
+            await this.#queryCommits(owner, repo);
+            await this.#queryBranches(owner, repo);
+            await this.#queryTags(owner, repo);
+            await this.#queryFiles(owner, repo, this.#currentDirectory);
         } catch (e) {
             alert(`Failed to query repository (${e})`);
-            this.setIdle();
+            this.#setIdle();
             return;
         }
 
         // Display data
-        this.displayLeft();
-        this.displayHeader();
-        this.displayFiles();
-        this.displayRight();
+        this.#displayLeft();
+        this.#displayHeader();
+        this.#displayFiles();
+        this.#displayRight();
 
-        this.setIdle();
+        this.#setIdle();
     }
 
-    setFetching() {
+    #setFetching() {
         const title = document.querySelector("#input-title");
-        title.innerHTML = `Fetching ${this.owner} / ${this.repo}...`;
+        title.innerHTML = `Fetching ${this.#owner} / ${this.#repo}...`;
     }
 
-    setIdle() {
+    #setIdle() {
         const title = document.querySelector("#input-title");
         title.innerHTML = "Search for a repository..."
     }
 
-    getParentDirectory(path) {
+    #getParentDirectory(path) {
         return path.split("/").slice(0, -2).join("/") + "/";
     }
 
     // Query and set file contents
     //
     // NOTE: Makes 1 request
-    async queryFile(path, scroll) {
-        this.setFetching();
+    async #queryFile(path, scroll) {
+        this.#setFetching();
 
-        const res = await this.fetchHelper(`https://api.github.com/repos/${this.owner}/${this.repo}/contents${path}`);
+        const res = await this.#fetchHelper(`https://api.github.com/repos/${this.#owner}/${this.#repo}/contents${path}`);
         if (!res.ok) {
             alert(`Failed to query repository (${e})`);
-            this.setIdle();
+            this.#setIdle();
             return;
         }
 
         const json = await res.json();
-        this.fileName = json.name;
-        this.fileContents = atob(json.content);
+        this.#fileName = json.name;
+        this.#fileContents = atob(json.content);
 
-        this.setIdle();
-        this.displayFile();
+        this.#setIdle();
+        this.#displayFile();
 
         if (scroll) {
             const fileName = document.querySelector("#mid-file-name");
@@ -271,95 +262,96 @@ class Repository {
     // Query and update files
     //
     // NOTES: Makes 1 request
-    async changeDirectory(path) {
+    async #changeDirectory(path) {
         try {
-            let dir = `${this.currentDirectory}${path}/`;
+            let dir = `${this.#currentDirectory}${path}/`;
             if (path === "..")
-                dir = this.getParentDirectory(this.currentDirectory);
+                dir = this.#getParentDirectory(this.#currentDirectory);
 
-            this.setFetching();
-            await this.queryFiles(this.owner, this.repo, dir);
+            this.#setFetching();
+            await this.#queryFiles(this.#owner, this.#repo, dir);
+            this.#currentDirectory = dir;
         } catch (e) {
             alert(`Failed to query repository (${e})`);
-            this.setIdle();
+            this.#setIdle();
             return;
         }
 
-        this.setIdle();
-        this.displayFiles();
+        this.#setIdle();
+        this.#displayFiles();
     }
 
     // Change directory or show file
     //
     // NOTE: Makes 1 request
-    fileInteraction(path, isDir) {
+    #fileInteraction(path, isDir) {
         if (isDir)
-            this.changeDirectory(path);
+            this.#changeDirectory(path);
         else
-            this.queryFile(`${this.currentDirectory}${path}`, true);
+            this.#queryFile(`${this.#currentDirectory}${path}`, true);
     }
 
     // Populate left side with data
-    displayLeft() {
+    #displayLeft() {
         // Commits
         const commitsTitle = document.querySelector("#left-commits-title");
-        commitsTitle.href = `https://www.github.com/${this.owner}/${this.repo}/commits`;
+        commitsTitle.href = `https://www.github.com/${this.#owner}/${this.#repo}/commits`;
 
         const commitsTotal = document.querySelector("#left-commits-total");
-        commitsTotal.innerHTML = this.commitsTotal;
+        commitsTotal.innerHTML = this.#commitsTotal;
 
         const commits = document.querySelector("#left-commits");
-        for (const { message, url } of this.commits) {
+        for (const { message, url } of this.#commits) {
             commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${message}</a></li>`;
         }
 
         // Branches
         const branchesTotal = document.querySelector("#left-branches-total");
-        branchesTotal.innerHTML = this.branchesTotal;
+        branchesTotal.innerHTML = this.#branchesTotal;
 
         const branches = document.querySelector("#left-branches");
-        for (const name of this.branches) {
-            const url = `https://www.github.com/${this.owner}/${this.repo}/tree/${name}`;
+        for (const name of this.#branches) {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${name}`;
             branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${name}</a></li>`;
         }
 
         // Tags
         const tagsTitle = document.querySelector("#left-tags-title");
-        tagsTitle.href = `https://www.github.com/${this.owner}/${this.repo}/tags`;
+        tagsTitle.href = `https://www.github.com/${this.#owner}/${this.#repo}/tags`;
 
         const tagsTotal = document.querySelector("#left-tags-total");
-        tagsTotal.innerHTML = this.tagsTotal;
+        tagsTotal.innerHTML = this.#tagsTotal;
 
         const tags = document.querySelector("#left-tags");
-        for (const name of this.tags) {
-            const url = `https://www.github.com/${this.owner}/${this.repo}/releases/tag/${name}`;
+        for (const name of this.#tags) {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/releases/tag/${name}`;
             tags.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${name}</a></li>`;
         }
     }
 
     // Populate header with data
-    displayHeader() {
+    #displayHeader() {
         const owner = document.querySelector("#mid-owner");
-        owner.href = `https://www.github.com/${this.owner}`;
-        owner.innerHTML = `${this.owner}`;
+        owner.href = `https://www.github.com/${this.#owner}`;
+        owner.innerHTML = `${this.#owner}`;
 
         const repo = document.querySelector("#mid-repo");
-        repo.href = `https://www.github.com/${this.owner}/${this.repo}`;
-        repo.innerHTML = `${this.repo}`;
+        repo.href = `https://www.github.com/${this.#owner}/${this.#repo}`;
+        repo.innerHTML = `${this.#repo}`;
 
         const avatar = document.querySelector("#mid-avatar");
-        avatar.src = `${this.avatar}`;
+        avatar.src = `${this.#avatar}`;
     }
 
     // Populate files
-    displayFiles() {
+    #displayFiles() {
         const files = document.querySelector("#mid-files");
         files.innerHTML = "";
 
         files.innerHTML = "";
 
-        for (const { name, isDir } of this.files) {
-            const url = `https://www.github.com/${this.owner}/${this.repo}/tree/${this.branches.at(0)}/${name}`;
+        for (const { name, isDir } of this.#files) {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${this.#branches.at(0)}/${name}`;
             files.innerHTML += `
                 <tr class="mid-entry">
                     <td class="mid-name link ${(isDir && "dir") || ""}">${name + ((isDir && "/") || "")}</td>
@@ -370,32 +362,32 @@ class Repository {
         const entries = document.querySelectorAll(".mid-name");
         entries.forEach((e, i) => {
             e.addEventListener("click", async () => {
-                const { name, isDir } = this.files[i];
-                await this.fileInteraction(name, isDir);
+                const { name, isDir } = this.#files[i];
+                await this.#fileInteraction(name, isDir);
             });
         });
     }
 
-    displayFile() {
+    #displayFile() {
         const fileName = document.querySelector("#mid-file-name");
-        fileName.innerHTML = this.fileName;
+        fileName.innerHTML = this.#fileName;
 
         const fileContents = document.querySelector("#mid-file-contents");
-        fileContents.innerHTML = this.fileContents;
+        fileContents.innerHTML = this.#fileContents;
     }
 
     // Populate about section with data
-    displayRight() {
+    #displayRight() {
         const desc = document.querySelector("#right-desc");
-        desc.innerHTML = `${this.description}`;
+        desc.innerHTML = `${this.#description}`;
 
         const stars = document.querySelector("#right-stars");
-        stars.innerHTML = `${this.stars} <span class="left-amount">stars</span>`
+        stars.innerHTML = `${this.#stars} <span class="left-amount">stars</span>`
 
         const watching = document.querySelector("#right-watching");
-        watching.innerHTML = `${this.watching} <span class="left-amount">watching</span>`
+        watching.innerHTML = `${this.#watching} <span class="left-amount">watching</span>`
 
         const forks = document.querySelector("#right-forks");
-        forks.innerHTML = `${this.forks} <span class="left-amount">forks</span>`
+        forks.innerHTML = `${this.#forks} <span class="left-amount">forks</span>`
     }
 }
