@@ -375,7 +375,7 @@ class Repository {
         fileName.innerHTML = this.#fileName;
 
         const fileContents = document.querySelector("#mid-file-contents");
-        fileContents.innerHTML = this.#fileContents;
+        fileContents.innerText = this.#fileContents;
     }
 
     // Populate about section with data
