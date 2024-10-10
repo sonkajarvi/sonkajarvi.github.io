@@ -98,10 +98,10 @@ class Repository {
         if (!fourPerPage.ok)
             throw new Error(fourPerPage.status);
 
-        // Get the top 5 branches
+        // Get the top 4 branches
         const branches = await fourPerPage.json();
-        if (branches.length === 0) {
-            this.branchesTotal = 0;
+        if (branches.length <= 1) {
+            this.branchesTotal = branches.length;
             return;
         }
 
