@@ -16,5 +16,8 @@ function onLoad() {
         return;
     }
 
+    const title = document.querySelector("#input-title");
+    title.innerHTML = `Fetching ${owner} / ${repo}...`;
+
     repository.init(owner, repo);
 }

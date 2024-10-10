@@ -180,9 +180,8 @@ class Repository {
 
     // NOTE: Makes 9 requests; 1 + 2 + 2 + 2 + 2
     async init(owner, repo) {
-        // Get repository data,
-        // also checks if repository exists
-        
+        const title = document.querySelector("#input-title");
+
         // Get commit data
         try {
             await this.queryRepo(owner, repo);
@@ -197,6 +196,7 @@ class Repository {
             console.log("query files");
         } catch (e) {
             alert(`Failed to query repository (${e})`);
+            title.innerHTML = "Search for a repository..."
             return;
         }
 
@@ -209,6 +209,8 @@ class Repository {
         this.displayHeader();
         this.displayFiles();
         this.displayRight();
+
+        title.innerHTML = "Search for a repository..."
     }
 
     // Populate left side with data
