@@ -24,5 +24,5 @@ window.addEventListener("load", () => {
     window.setTimeout(() => {
         const header = document.querySelector("#header-title");
         header.innerHTML += " :)";
-    }, 1000 * 5);
+    }, 1000 * 10);
 });
