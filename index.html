@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>web</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body onload="onLoad()">
+    <!-- 
+        Header and repository search bar
+    -->
+    <header id="header">
+        <h1 id="header-title">GitHub repository viewer</h1>
+
+        <form>
+            <h3 id="input-title">Search for a repository...</h3>
+            <input type="text" id="input-field" name="q" placeholder="torvalds/linux" required>
+            <input type="submit" id="input-submit" value="Search">
+        </form>
+    </header>
+
+    <main>
+        <!--
+            On the left:
+                Commits, branches and tags, max. 5
+        -->
+        <aside id="left-container">
+            <!--
+                Commits
+            -->
+            <section>
+                <h2>
+                    <a id="left-commits-title" class="link" title="View on GitHub">Commits</a>
+                    <span id="left-commits-total" class="left-amount"></span>
+                </h2>
+                <ul id="left-commits"></ul>
+            </section>
+
+            <!--
+                Branches
+            -->
+            <section>
+                <h2>
+                    Branches
+                    <span id="left-branches-total" class="left-amount"></span>
+                </h2>
+                <ul id="left-branches"></ul>
+            </section>
+
+            <!--
+                Tags
+            -->
+            <section>
+                <h2>
+                    <a id="left-tags-title" class="link" href="#" title="View on GitHub">Tags</a>
+                    <span id="left-tags-total" class="left-amount"></span>
+                </h2>
+                <ul id="left-tags"></ul>
+            </section>
+        </aside>
+
+        <!--
+            In the middle:
+                Repository name and owner
+                Directories and files
+        -->
+        <section>
+            <header id="mid-header">
+                <img id="mid-avatar">
+                <h2 id="mid-title">
+                    <a id="mid-owner" class="link" title="View on GitHub"></a>
+                    /
+                    <a id="mid-repo" class="link" title="View on GitHub"></a>
+                </h2>
+            </header>
+            <table id="mid-files"></table>
+        </section>
+
+        <!--
+            On the right:
+                Information from GitHub; description, stars, watching, forks, etc.
+        -->
+        <aside id="right-container">
+            <section>
+                <h2>About</h2>
+                <p id="right-desc"></p>
+            </section>
+            <section id="right-stats">
+                <ul>
+                    <li><h3 id="right-stars"></h3></li>
+                    <li><h3 id="right-watching"></h3></li>
+                    <li><h3 id="right-forks"></h3></li>
+                </ul>
+            </section>
+        </aside>
+    </main>
+</body>
+<script src="./repo.js"></script>
+<script src="./main.js"></script>
+</html>

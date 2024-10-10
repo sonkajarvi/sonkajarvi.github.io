@@ -1,0 +1,181 @@
+:root {
+    --color-body: #111;
+
+    --color-white: #fff;
+    --color-lightest-grey: #cbb;
+    --color-lighter-grey: #999;
+    --color-light-grey: #696969;
+    --color-grey: #191919;
+
+    --color-grey-hover: #333;
+}
+
+body {
+    background-color: var(--color-body);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.8rem;
+}
+
+main {
+    margin: 1em auto;
+    max-width: 80%;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+ul {
+    margin: auto;
+    padding: 0;
+}
+
+li {
+    padding: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.link {
+    text-decoration: none;
+}
+
+.link:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+
+/*
+ *      Header
+ */
+
+#header {
+    margin: auto;
+    max-width: 60%;
+    text-align: center;
+}
+
+#header-title {
+    color: var(--color-white);
+}
+
+#input-title {
+    color: var(--color-lighter-grey);
+}
+
+#input-field {
+    background-color: var(--color-grey);
+    border: 1px solid var(--color-light-grey);
+    border-radius: 8px;
+    color: var(--color-white);
+    min-width: 30%;
+    padding: 0.5em;
+}
+
+#input-field:focus {
+    outline: none;
+}
+
+#input-submit {
+    background-color: var(--color-grey);
+    border: 1px solid var(--color-light-grey);
+    border-radius: 8px;
+    color: var(--color-lightest-grey);
+    font-weight: bold;
+    min-width: 6em;
+    padding: 0.5em;
+}
+
+#input-submit:hover {
+    background-color: var(--color-grey-hover);
+    cursor: pointer;
+}
+
+
+/*
+ *      Left commits
+ */
+
+#left-container, #right-container {
+    background-color: var(--color-grey-hover);
+    border: 1px solid var(--color-light-grey);
+    border-radius: 8px;
+    color: var(--color-white);
+    padding: 1em;
+    min-width: 200px;
+}
+
+#left-container a {
+    color: var(--color-white);
+}
+
+.left-amount {
+    color: var(--color-lighter-grey);
+    font-size: 0.8rem;
+}
+
+
+/*
+ *      Middle title
+ */
+
+#mid-header {
+    align-items: center;
+    display: flex;
+    gap: 1em;
+    margin-left: 1em;
+}
+
+#mid-header > img {
+    height: 2em;
+    width: 2em;
+}
+
+#mid-title, #mid-title > a {
+    color: var(--color-white);
+}
+
+
+/*
+ *      Middle files
+ */
+
+#mid-files {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.mid-entry {
+    background-color: var(--color-grey);
+    border-top: 1px solid var(--color-light-grey);
+    border-bottom: 1px solid var(--color-light-grey);
+}
+
+.mid-name a {
+    color: var(--color-lightest-grey);
+    padding-left: 1em;
+}
+
+
+/*
+ *      Right about
+ */
+
+#right-desc {
+    color: var(--color-lightest-grey);
+}
+
+#right-stats {
+    margin: auto;
+    padding: 0;
+}
+
+#right-stats h3 {
+    margin: 2px;
+}
