@@ -150,6 +150,10 @@ li {
  *      Middle files
  */
 
+#mid-content {
+    max-width: 70%;
+}
+
 #mid-files {
     border-collapse: collapse;
     table-layout: fixed;
@@ -160,11 +164,29 @@ li {
     background-color: var(--color-grey);
     border-top: 1px solid var(--color-light-grey);
     border-bottom: 1px solid var(--color-light-grey);
+    color: var(--color-lightest-grey);
 }
 
-.mid-name a {
-    color: var(--color-lightest-grey);
+.mid-name {
     padding-left: 1em;
+}
+
+#mid-file {
+    background-color: var(--color-grey);
+    border-top: 1px solid var(--color-light-grey);
+    border-bottom: 1px solid var(--color-light-grey);
+    color: var(--color-lightest-grey);
+    padding: 1em;
+    margin-top: 1em;
+}
+
+#mid-file-name {
+    color: var(--color-white);
+}
+
+#mid-file-contents {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;
 }
 
 

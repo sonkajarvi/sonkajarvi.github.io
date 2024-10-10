@@ -16,9 +16,6 @@ window.addEventListener("load", () => {
         return;
     }
 
-    const title = document.querySelector("#input-title");
-    title.innerHTML = `Fetching ${owner} / ${repo}...`;
-
     repository.init(owner, repo);
 
     window.setTimeout(() => {
