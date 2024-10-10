@@ -20,4 +20,9 @@ window.addEventListener("load", () => {
     title.innerHTML = `Fetching ${owner} / ${repo}...`;
 
     repository.init(owner, repo);
+
+    window.setTimeout(() => {
+        const header = document.querySelector("#header-title");
+        header.innerHTML += " :)";
+    }, 1000 * 5);
 });
