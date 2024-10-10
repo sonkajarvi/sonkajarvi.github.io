@@ -238,7 +238,7 @@ class Repository {
     // Query and set file contents
     //
     // NOTE: Makes 1 request
-    async #queryFile(path, scroll) {
+    async #queryFile(path) {
         this.#setFetching();
 
         const res = await this.#fetchHelper(`https://api.github.com/repos/${this.#owner}/${this.#repo}/contents${path}`);
@@ -255,10 +255,8 @@ class Repository {
         this.#setIdle();
         this.#displayFile();
 
-        if (scroll) {
-            const fileName = document.querySelector("#mid-file-name");
-            fileName.scrollIntoView({behavior: 'smooth'});
-        }
+        const fileName = document.querySelector("#mid-file-name");
+        fileName.scrollIntoView({ behavior: "smooth" });
     }
 
     // Query and update files
@@ -371,7 +369,7 @@ class Repository {
     }
 
     #displayFile() {
-        const fileName = document.querySelector("#mid-file-name");
+        const fileName = document.querySelector("#mid-file-name span");
         fileName.innerHTML = this.#fileName;
 
         const fileContents = document.querySelector("#mid-file-contents");

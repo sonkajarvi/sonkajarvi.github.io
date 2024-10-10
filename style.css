@@ -205,6 +205,13 @@ li {
     color: var(--color-white);
 }
 
+#mid-file-name a {
+    color: var(--color-light-grey);
+    font-size: 0.7em;
+    font-weight: normal;
+    margin-left: 0.5em;
+}
+
 #mid-file-contents {
     font-family: 'Courier New', Courier, monospace;
     white-space: pre-wrap;

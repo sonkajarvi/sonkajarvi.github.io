@@ -45,6 +45,12 @@ window.addEventListener("load", () => {
         prev = next;
     }, 2000);
 
+    const backToTop = document.querySelector("#mid-file-name a");
+    const header = document.querySelector("#header");
+    backToTop.addEventListener("click", () => {
+        header.scrollIntoView({ behavior: "smooth" });
+    });
+
     const tokenSave = document.querySelector("#input-token-save");
     tokenSave.addEventListener("click", () => {
         const token = prompt("Save token in LocalStorage");
