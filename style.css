@@ -115,6 +115,13 @@ li {
     cursor: pointer;
 }
 
+.input-token {
+    background: none;
+    color: var(--color-light-grey);
+    border: none;
+    outline: none;
+}
+
 
 /*
  *      Left commits

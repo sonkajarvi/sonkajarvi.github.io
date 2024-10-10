@@ -21,11 +21,13 @@ class Repository {
     #fileContents = "";
 
     async #fetchHelper(url) {
-        return await fetch(url, {
-            headers: {
-                "X-GitHub-Api-Version": "2022-11-28"
-            }
-        })
+        let headers = { "X-GitHub-Api-Version": "2022-11-28" };
+
+        const token = localStorage.getItem("token");
+        if (token)
+            headers["Authorization"] = `Bearer ${token}`;
+
+        return await fetch(url, { headers });
     }
 
     // Request repository data from GitHub

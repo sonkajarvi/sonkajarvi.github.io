@@ -3,6 +3,18 @@ const QUERY_PARAM = "q";
 let repository = new Repository();
 
 window.addEventListener("load", () => {
+    const tokenSave = document.querySelector("#input-token-save");
+    tokenSave.addEventListener("click", () => {
+        const token = prompt("Save token in LocalStorage");
+        localStorage.setItem("token", token);
+    });
+
+    const tokenClear = document.querySelector("#input-token-clear");
+    tokenClear.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        alert("Token removed from LocalStorage");
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
 
     if (!urlParams.has(QUERY_PARAM)) {
