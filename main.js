@@ -20,6 +20,11 @@ window.addEventListener("load", () => {
 
     window.setTimeout(() => {
         const header = document.querySelector("#header-title");
-        header.innerHTML += " :)";
+        header.innerHTML = "GitHub repository viewer :)";
     }, 1000 * 10);
+
+    window.setTimeout(() => {
+        const header = document.querySelector("#header-title");
+        header.innerHTML = "GitHub repository viewer :D";
+    }, 1000 * 20);
 });
