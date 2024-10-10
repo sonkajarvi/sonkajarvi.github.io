@@ -8,6 +8,7 @@
     --color-grey: #191919;
 
     --color-grey-hover: #333;
+    --color-directory: #0c0;
 }
 
 body {
@@ -47,6 +48,10 @@ li {
 .link:hover {
     cursor: pointer;
     text-decoration: underline;
+}
+
+.dir {
+    color: var(--color-directory) !important;
 }
 
 

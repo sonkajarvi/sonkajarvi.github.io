@@ -273,7 +273,7 @@ class Repository {
             const url = `https://www.github.com/${this.owner}/${this.repo}/tree/${this.branches.at(0)}/${name}`;
             files.innerHTML += `
                 <tr class="mid-entry">
-                    <td class="mid-name" title="View on GitHub"><a class="link" href="${url}">${name + (isDir && "/")}</a></td>
+                    <td class="mid-name" title="View on GitHub"><a class="link ${(isDir && "dir") || ""}" href="${url}">${name + ((isDir && "/") || "")}</a></td>
                 </tr>
             `;
         }
