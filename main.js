@@ -2,7 +2,49 @@ const QUERY_PARAM = "q";
 
 let repository = new Repository();
 
+const REPOS = [
+    "torvalds/linux",
+    "git/git",
+    "llvm/llvm-project",
+    "facebook/react",
+    "microsoft/vscode",
+
+    "chromium/chromium",
+    "v8/v8",
+    "webkit/webkit",
+    "sveltejs/svelte",
+    "vuejs/vue",
+
+    "twbs/bootstrap",
+    "flutter/flutter",
+    "vercel/next.js",
+    "golang/go",
+    "electron/electron",
+
+    "nodejs/node",
+    "rust-lang/rust",
+    "neovim/neovim",
+    "godotengine/godot",
+    "ladybirdbrowser/ladybird"
+];
+
 window.addEventListener("load", () => {
+    // Change placeholder every so often
+    const input = document.querySelector("#input-field");
+    let prev;
+
+    window.setInterval(() => {
+        let next;
+
+        // No back to back
+        do {
+            next = REPOS[Math.floor(Math.random() * REPOS.length)];
+        } while (prev === next);
+
+        input.placeholder = next;
+        prev = next;
+    }, 2000);
+
     const tokenSave = document.querySelector("#input-token-save");
     tokenSave.addEventListener("click", () => {
         const token = prompt("Save token in LocalStorage");
