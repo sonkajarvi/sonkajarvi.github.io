@@ -224,12 +224,12 @@ class Repository {
 
     #setFetching() {
         const title = document.querySelector("#input-title");
-        title.innerHTML = `Fetching ${this.#owner} / ${this.#repo}...`;
+        title.innerText = `Fetching ${this.#owner} / ${this.#repo}...`;
     }
 
     #setIdle() {
         const title = document.querySelector("#input-title");
-        title.innerHTML = "Search for a repository..."
+        title.innerText = "Search for a repository..."
     }
 
     // Query and set file contents
@@ -297,7 +297,7 @@ class Repository {
         branchesTotal.innerHTML = this.#branchesTotal;
 
         const branches = document.querySelector("#left-branches");
-        // for (const name of this.#branches) {
+        // :.|:;
         this.#branches.forEach((e) => {
             const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${e.name}`;
             branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.name}</a></li>`;

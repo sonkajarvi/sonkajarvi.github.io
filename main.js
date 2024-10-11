@@ -34,15 +34,15 @@ window.addEventListener("load", () => {
     let prev;
 
     window.setInterval(() => {
-        let next;
+        let itBe;
 
-        // No back to back
+        // No back to back repos
         do {
-            next = REPOS[Math.floor(Math.random() * REPOS.length)];
-        } while (prev === next);
+            itBe = REPOS[Math.floor(Math.random() * REPOS.length)];
+        } while (prev === itBe);
 
-        input.placeholder = next;
-        prev = next;
+        input.placeholder = itBe;
+        prev = itBe;
     }, 2000);
 
     const backToTop = document.querySelector("#mid-file-name a");
