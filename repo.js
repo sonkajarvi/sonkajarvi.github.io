@@ -289,7 +289,8 @@ class Repository {
 
         const commits = document.querySelector("#left-commits");
         this.#commits.forEach((e) => {
-            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.message}</a></li>`;
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/commits/${this.#branches[0]}`;
+            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${e.message}</a></li>`;
         });
 
         // Branches
@@ -297,10 +298,9 @@ class Repository {
         branchesTotal.innerHTML = this.#branchesTotal;
 
         const branches = document.querySelector("#left-branches");
-        // :.|:;
         this.#branches.forEach((e) => {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${e.name}`;
-            branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.name}</a></li>`;
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${e}`;
+            branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${e}</a></li>`;
         });
 
         // Tags
@@ -312,8 +312,8 @@ class Repository {
 
         const tags = document.querySelector("#left-tags");
         this.#tags.forEach((e) => {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/releases/tag/${e.name}`;
-            tags.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.name}</a></li>`;
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/releases/tag/${e}`;
+            tags.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${e}</a></li>`;
         });
     }
 
