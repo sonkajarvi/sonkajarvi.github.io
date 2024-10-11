@@ -16,7 +16,7 @@ class Repository {
     #tagsTotal = 0;
 
     #files = [];
-    #currentDirectory = "/";
+    #path = new Path();
     #fileName = "";
     #fileContents = "";
 
@@ -157,8 +157,8 @@ class Repository {
     // Query root files and directories
     // 
     // NOTE: Makes 1 request
-    async #queryFiles(owner, repo, path) {
-        const res = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/contents${path}`);
+    async #queryFiles(owner, repo) {
+        const res = await this.#fetchHelper(`https://api.github.com/repos/${owner}/${repo}/contents${this.#path.pwd()}`);
         if (!res)
             throw new Error(res.status);
 
@@ -179,21 +179,20 @@ class Repository {
 
         this.#files.length = 0;
 
-        if (path !== "/")
+        // Add entry for previous directory if not in root directory
+        if (!this.#path.isRoot())
             this.#files.push({ name: "..", "isDir": true });
 
         this.#files.push(...tmp_dirs);
         this.#files.push(...tmp_files);
-        this.currentDirectory = path;
 
-        console.log("Query files:", path);
+        console.log("Query files:", this.#path.pwd());
     }
 
     // NOTE: Makes 9 requests; 1 + 2 + 2 + 2 + 2
     async init(owner, repo) {
         this.#owner = owner;
         this.#repo = repo;
-        this.#currentDirectory = "/";
 
         const title = document.querySelector("#input-title");
 
@@ -205,7 +204,9 @@ class Repository {
             await this.#queryCommits(owner, repo);
             await this.#queryBranches(owner, repo);
             await this.#queryTags(owner, repo);
-            await this.#queryFiles(owner, repo, this.#currentDirectory);
+
+            // Directory is "/" here
+            await this.#queryFiles(owner, repo);
         } catch (e) {
             alert(`Failed to query repository (${e})`);
             this.#setIdle();
@@ -231,17 +232,14 @@ class Repository {
         title.innerHTML = "Search for a repository..."
     }
 
-    #getParentDirectory(path) {
-        return path.split("/").slice(0, -2).join("/") + "/";
-    }
-
     // Query and set file contents
     //
     // NOTE: Makes 1 request
     async #queryFile(path) {
         this.#setFetching();
 
-        const res = await this.#fetchHelper(`https://api.github.com/repos/${this.#owner}/${this.#repo}/contents${path}`);
+        const fullPath = this.#path.pwd() + path;
+        const res = await this.#fetchHelper(`https://api.github.com/repos/${this.#owner}/${this.#repo}/contents${fullPath}`);
         if (!res.ok) {
             alert(`Failed to query repository (${e})`);
             this.#setIdle();
@@ -257,6 +255,8 @@ class Repository {
 
         const fileName = document.querySelector("#mid-file-name");
         fileName.scrollIntoView({ behavior: "smooth" });
+
+      console.log("Query file:", fullPath);
     }
 
     // Query and update files
@@ -264,13 +264,9 @@ class Repository {
     // NOTES: Makes 1 request
     async #changeDirectory(path) {
         try {
-            let dir = `${this.#currentDirectory}${path}/`;
-            if (path === "..")
-                dir = this.#getParentDirectory(this.#currentDirectory);
-
+            this.#path.cd(path);
             this.#setFetching();
-            await this.#queryFiles(this.#owner, this.#repo, dir);
-            this.#currentDirectory = dir;
+            await this.#queryFiles(this.#owner, this.#repo);
         } catch (e) {
             alert(`Failed to query repository (${e})`);
             this.#setIdle();
@@ -279,16 +275,7 @@ class Repository {
 
         this.#setIdle();
         this.#displayFiles();
-    }
-
-    // Change directory or show file
-    //
-    // NOTE: Makes 1 request
-    #fileInteraction(path, isDir) {
-        if (isDir)
-            this.#changeDirectory(path);
-        else
-            this.#queryFile(`${this.#currentDirectory}${path}`, true);
+        this.#displayHeader();
     }
 
     // Populate left side with data
@@ -301,19 +288,20 @@ class Repository {
         commitsTotal.innerHTML = this.#commitsTotal;
 
         const commits = document.querySelector("#left-commits");
-        for (const { message, url } of this.#commits) {
-            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${message}</a></li>`;
-        }
+        this.#commits.forEach((e) => {
+            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.message}</a></li>`;
+        });
 
         // Branches
         const branchesTotal = document.querySelector("#left-branches-total");
         branchesTotal.innerHTML = this.#branchesTotal;
 
         const branches = document.querySelector("#left-branches");
-        for (const name of this.#branches) {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${name}`;
-            branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${name}</a></li>`;
-        }
+        // for (const name of this.#branches) {
+        this.#branches.forEach((e) => {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${e.name}`;
+            branches.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.name}</a></li>`;
+        });
 
         // Tags
         const tagsTitle = document.querySelector("#left-tags-title");
@@ -323,24 +311,43 @@ class Repository {
         tagsTotal.innerHTML = this.#tagsTotal;
 
         const tags = document.querySelector("#left-tags");
-        for (const name of this.#tags) {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/releases/tag/${name}`;
-            tags.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${name}</a></li>`;
-        }
+        this.#tags.forEach((e) => {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/releases/tag/${e.name}`;
+            tags.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.name}</a></li>`;
+        });
     }
 
     // Populate header with data
     #displayHeader() {
+        const avatar = document.querySelector("#mid-avatar");
+        avatar.src = `${this.#avatar}`;
+
         const owner = document.querySelector("#mid-owner");
         owner.href = `https://www.github.com/${this.#owner}`;
         owner.innerHTML = `${this.#owner}`;
 
-        const repo = document.querySelector("#mid-repo");
-        repo.href = `https://www.github.com/${this.#owner}/${this.#repo}`;
-        repo.innerHTML = `${this.#repo}`;
+        const paths = this.#path.getPaths();
 
-        const avatar = document.querySelector("#mid-avatar");
-        avatar.src = `${this.#avatar}`;
+        const midPath = document.querySelector("#mid-path");
+        midPath.innerHTML = `
+            <span class="left-amount">/</span>
+            <a class="link" data-depth="${paths.length}">${this.#repo}</a>
+        `;
+        paths.forEach((e, i) => {
+            midPath.innerHTML += `
+                <span class="left-amount">/</span>
+                <a class="link" data-depth="${paths.length - 1 - i}">${e}</a>
+            `;
+        });
+
+        const pathElems = document.querySelectorAll("#mid-path a");
+        pathElems.forEach((e) => {
+            e.addEventListener("click", async () => {
+                // Bit hacky
+                for (let i = 0; i < e.dataset.depth; i++)
+                    await this.#changeDirectory("..");
+            });
+        });
     }
 
     // Populate files
@@ -348,22 +355,23 @@ class Repository {
         const files = document.querySelector("#mid-files");
         files.innerHTML = "";
 
-        files.innerHTML = "";
-
-        for (const { name, isDir } of this.#files) {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${this.#branches.at(0)}/${name}`;
+        this.#files.forEach((e) => {
+            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${this.#branches.at(0)}/${e.name}`;
             files.innerHTML += `
                 <tr class="mid-entry">
-                    <td class="mid-name link ${(isDir && "dir") || ""}">${name + ((isDir && "/") || "")}</td>
+                    <td class="mid-name link ${(e.isDir && "dir") || ""}">${e.name + ((e.isDir && "/") || "")}</td>
                 </tr>
             `;
-        }
+        });
 
         const entries = document.querySelectorAll(".mid-name");
         entries.forEach((e, i) => {
             e.addEventListener("click", async () => {
                 const { name, isDir } = this.#files[i];
-                await this.#fileInteraction(name, isDir);
+                if (isDir)
+                    await this.#changeDirectory(name);
+                else
+                    await this.#queryFile(name, true);
             });
         });
     }
