@@ -192,6 +192,12 @@ li {
     padding-left: 1em;
 }
 
+.mid-size {
+    float: right;
+    color: var(--color-light-grey);
+    padding-right: 1em;
+}
+
 #mid-file {
     background-color: var(--color-grey);
     border-top: 1px solid var(--color-light-grey);

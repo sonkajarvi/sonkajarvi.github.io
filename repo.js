@@ -172,9 +172,9 @@ class Repository {
         files.map((e) => {
             const isDir = e.type === "dir";
             if (isDir)
-                tmp_dirs.push({ name: e.name, "isDir": isDir});
+                tmp_dirs.push({ name: e.name, "isDir": isDir, size: e.size});
             else
-                tmp_files.push({ name: e.name, "isDir": isDir});
+                tmp_files.push({ name: e.name, "isDir": isDir, size: e.size});
         });
 
         this.#files.length = 0;
@@ -355,11 +355,23 @@ class Repository {
         const files = document.querySelector("#mid-files");
         files.innerHTML = "";
 
+        // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+        const formatBytes = (bytes, decimals = 1) => {
+            if (!+bytes) return '0 B'
+
+            const k = 1000
+            const dm = decimals < 0 ? 0 : decimals
+            const sizes = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+            const i = Math.floor(Math.log(bytes) / Math.log(k))
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+        }
+
         this.#files.forEach((e) => {
-            const url = `https://www.github.com/${this.#owner}/${this.#repo}/tree/${this.#branches.at(0)}/${e.name}`;
             files.innerHTML += `
                 <tr class="mid-entry">
                     <td class="mid-name link ${(e.isDir && "dir") || ""}">${e.name + ((e.isDir && "/") || "")}</td>
+                    <td class="mid-size" colspan="2">${(!e.isDir && formatBytes(e.size)) || ""}</td>
                 </tr>
             `;
         });
