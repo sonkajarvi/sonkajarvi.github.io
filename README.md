@@ -89,3 +89,4 @@ Arviointi:
 
 * 5/5:
     * async/await: repo.js:23, 39, 59
+    * latausindikaattori: repo.js:255
