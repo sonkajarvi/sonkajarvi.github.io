@@ -248,7 +248,7 @@ class Repository {
 
         const json = await res.json();
         this.#fileName = json.name;
-        this.#fileContents = atob(json.content);
+        this.#fileContents = decodeURIComponent(escape(atob(json.content)));
 
         this.#setIdle();
         this.#displayFile();
