@@ -290,7 +290,7 @@ class Repository {
         const commits = document.querySelector("#left-commits");
         this.#commits.forEach((e) => {
             const url = `https://www.github.com/${this.#owner}/${this.#repo}/commits/${this.#branches[0]}`;
-            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${url}">${e.message}</a></li>`;
+            commits.innerHTML += `<li title="View on GitHub"><a class="link" href="${e.url}">${e.message}</a></li>`;
         });
 
         // Branches
